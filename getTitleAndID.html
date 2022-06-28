@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<title>Online jQuery Editor</title>
+<script src="https://www.tutorialspoint.com/jquery/jquery-3.6.0.js"></script>
+<script>
+   /* new coding. Please replace and use your api3 key */
+
+function start(){
+    count = 0; 
+    j = 1;
+    $('#area1').val('');
+    getVids();
+}
+function getVids(PageToken){
+pid = $('#searchtext1').val();
+$.get(
+    "https://www.googleapis.com/youtube/v3/playlistItems",{
+    part : 'snippet', 
+    maxResults : 50,
+    playlistId : pid,
+    pageToken : PageToken,
+    key: 'AIzaSyBmn9tD95L_dbCfy_VQ33kwoaQCo8l5IN4'
+    },
+    function(data){
+          myPlan(data);
+    }        
+    );  
+}
+count = 0;
+str = '';
+j = 1;
+ function myPlan(data){
+  nextPageToken=data.nextPageToken;
+  pageLen = data.items.length;
+  count += parseInt(pageLen);
+  
+  for(i=0; i<pageLen; i++){
+           str += 'numberList_' + j + ' = [' + j + ', "' + data.items[i].snippet.title + '", "' + data.items[i].snippet.resourceId.videoId + '"];\n';
+           j++;
+  }
+ 
+   if(typeof nextPageToken == 'undefined'){
+          total = data.pageInfo.totalResults;
+          $('#all').html(count + '/' + total + ' videos');
+          ind = str.lastIndexOf(',');
+          str1 = str.substring(0, ind);
+          $('#area1').val(str1);
+          return;      
+      }else{
+          getVids(nextPageToken);
+      }
+ }
+</script>
+</head>
+<body>
+  <input type="text"  value="PL4Mnd4PpJ2R_T9tQiFG35dUSRsKYJd_bF" 
+  id="searchtext1" size="75">&nbsp;
+ <button onclick="start()">타이틀/VideoID 검색</button>
+ 
+ <br><br>         
+ TOTAL:&nbsp;<span id="all"></span><br>
+ <textarea id="area1" style="width:1000px;height:500px;;font-size:12pt"></textarea>
+
+</body>
+</html>
